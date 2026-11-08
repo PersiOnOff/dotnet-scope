@@ -13,6 +13,7 @@ All notable changes to this project are documented here. The format follows
 - Saved filters: the current type, search, duration and sort can be stored as a named chip (persisted in `localStorage`).
 - “Slowest first” sort order for the event stream.
 - Russian UI next to English: the language follows the browser, can be switched in the sidebar, and is remembered. Dictionaries are typed against the English one, so a missing key fails the build; plural forms are language-specific.
+- Russian README (`README.ru.md`) with a language switch at the top of both files.
 
 ## [0.1.0] - 2026-11-08
 

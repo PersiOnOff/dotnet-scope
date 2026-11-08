@@ -5,6 +5,8 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![.NET 10](https://img.shields.io/badge/.NET-10.0-512bd4)
 
+**English** · [Русский](README.ru.md)
+
 **A self-hosted dev dashboard for ASP.NET Core.** HTTP requests, EF Core SQL, logs and exceptions in one real-time timeline — grouped by the request that caused them.
 
 No agent. No cloud account. No telemetry leaving your machine. Three lines of code and a tab at `/_dashboard`.
@@ -131,6 +133,8 @@ The UI follows your browser language and remembers an explicit choice. English a
 </p>
 
 Adding a language is one file: copy [`src/DevDashboard.UI/src/i18n/en.ts`](src/DevDashboard.UI/src/i18n/en.ts), translate it, and register the locale in `i18n/index.tsx`. The Russian dictionary is typed against the English one, so a missing key is a compile error instead of a stray English string at runtime; plural forms are per-language (1 событие / 2 события / 5 событий).
+
+This README is also available in Russian: [README.ru.md](README.ru.md).
 
 ## How it works
 

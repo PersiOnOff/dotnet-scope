@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" Condition="Exists('..\..\README.md')" />
+    <None Include="..\..\README.ru.md" Pack="true" PackagePath="\" Condition="Exists('..\..\README.ru.md')" />
     <None Include="..\..\LICENSE" Pack="true" PackagePath="\" Condition="Exists('..\..\LICENSE')" />
   </ItemGroup>
 
