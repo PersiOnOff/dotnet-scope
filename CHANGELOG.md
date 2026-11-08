@@ -20,6 +20,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [0.1.0] - 2026-11-08
 
+First public release — published on [nuget.org](https://www.nuget.org/packages/DotNetScope).
+
 ### Added
 
 - HTTP capture: method, path, status code, duration, request and response bodies.
