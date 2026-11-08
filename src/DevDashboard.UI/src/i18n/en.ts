@@ -1,0 +1,92 @@
+export const en = {
+  documentTitle: 'DotNetScope — .NET dev dashboard',
+  app: { name: 'DotNetScope', tagline: 'dev dashboard' },
+
+  nav: {
+    all: 'All events',
+    http: 'Requests',
+    sql: 'SQL',
+    log: 'Logs',
+    exception: 'Exceptions',
+  },
+
+  types: { http: 'HTTP', sql: 'SQL', log: 'LOG', exception: 'ERR' },
+
+  connection: {
+    connecting: 'Connecting…',
+    live: 'Live',
+    reconnecting: 'Reconnecting…',
+    offline: 'Offline',
+    paused: 'Paused',
+  },
+
+  language: { label: 'Language' },
+  privacy: 'Everything is captured in memory and never leaves this process.',
+
+  toolbar: {
+    filter: 'Filter by path, SQL, message…',
+    anyDuration: 'Any duration',
+    over100: '> 100 ms',
+    over500: '> 500 ms',
+    over1s: '> 1 s',
+    sortLabel: 'Sort order',
+    sortNewest: 'Newest first',
+    sortSlowest: 'Slowest first',
+    saveFilter: 'Save filter',
+    nameFilter: 'Name this filter',
+    save: 'Save',
+    saved: 'Saved',
+    pause: 'Pause',
+    resume: 'Resume',
+    clear: 'Clear',
+    applyFilter: 'Apply this filter',
+    deleteFilter: 'Delete this filter',
+    events: (count: number) => `${count} ${count === 1 ? 'event' : 'events'}`,
+  },
+
+  list: {
+    time: 'Time',
+    type: 'Type',
+    summary: 'Summary',
+    status: 'Status',
+    duration: 'Duration',
+    emptyTitle: 'Nothing captured yet',
+    emptyBody: 'Hit your API and the request, its SQL and its logs appear here in real time.',
+    terminalHint: '# in another terminal',
+    noMatches: 'No event matches this filter.',
+    noMatchesHint: 'Clear the search box or widen the duration filter.',
+  },
+
+  details: {
+    placeholderTitle: 'Select an event to inspect it.',
+    placeholderBody: 'SQL, bodies and stack traces are grouped by request.',
+    close: 'Close',
+    sql: 'SQL',
+    parameters: 'Parameters',
+    requestBody: 'Request body',
+    responseBody: 'Response body',
+    responseBodyJson: 'Response body · JSON',
+    exception: 'Exception',
+    related: 'Related events',
+    noRelated: 'No SQL or logs were emitted while this request ran.',
+    partOfRequest: 'Part of request',
+    category: 'Category',
+    eventId: 'Event id',
+    copy: 'copy',
+    copied: 'copied',
+    copyFrame: 'Copy frame',
+    exportMarkdown: 'Copy markdown',
+    exportJson: 'Copy JSON',
+    events: (count: number) => `${count} ${count === 1 ? 'event' : 'events'}`,
+  },
+
+  markdown: {
+    requestBody: 'Request body',
+    responseBody: 'Response body',
+    sql: 'SQL',
+    logs: 'Logs',
+    exception: 'Exception',
+  },
+}
+
+export type Messages = typeof en

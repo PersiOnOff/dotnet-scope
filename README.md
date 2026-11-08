@@ -41,6 +41,7 @@ DotNetScope is not a replacement for production observability. It is the thing y
 - **Exceptions that make sense** — message, stack frames highlighted, one click to copy a frame.
 - **Bodies on demand** — request and response bodies, JSON pretty-printed.
 - **Live over SignalR** — pause the stream when a noisy endpoint floods the list.
+- **English and Russian UI** — follows your browser language, one click in the sidebar to switch.
 - **Local-only by default** — remote access is opt-in, because this data is sensitive.
 - **Nothing to configure** — the UI is embedded in the assembly and served from `/_dashboard`.
 
@@ -120,6 +121,16 @@ Everything the UI shows is also available as JSON, so you can script it in CI or
 | `GET /_dashboard/api/requests/{id}` | one request with its SQL, logs and exceptions |
 | `GET /_dashboard/api/info` | version and retained event count |
 | `DELETE /_dashboard/api/events` | clear the in-memory buffer |
+
+## Localization
+
+The UI follows your browser language and remembers an explicit choice. English and Russian ship today; the switch is at the bottom of the sidebar.
+
+<p align="center">
+  <img src="docs/screenshots/dashboard-ru.png" width="85%" alt="Russian interface" />
+</p>
+
+Adding a language is one file: copy [`src/DevDashboard.UI/src/i18n/en.ts`](src/DevDashboard.UI/src/i18n/en.ts), translate it, and register the locale in `i18n/index.tsx`. The Russian dictionary is typed against the English one, so a missing key is a compile error instead of a stray English string at runtime; plural forms are per-language (1 событие / 2 события / 5 событий).
 
 ## How it works
 

@@ -12,6 +12,7 @@ All notable changes to this project are documented here. The format follows
 - “Copy markdown” and “Copy JSON” in the details pane, exporting the selected request or the request a SQL/log event belongs to.
 - Saved filters: the current type, search, duration and sort can be stored as a named chip (persisted in `localStorage`).
 - “Slowest first” sort order for the event stream.
+- Russian UI next to English: the language follows the browser, can be switched in the sidebar, and is remembered. Dictionaries are typed against the English one, so a missing key fails the build; plural forms are language-specific.
 
 ## [0.1.0] - 2026-11-08
 
