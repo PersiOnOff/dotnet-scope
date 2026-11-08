@@ -45,6 +45,10 @@ public sealed class HttpCaptureMiddleware
         var previousRequestId = TelemetryContext.RequestId;
         TelemetryContext.RequestId = requestId;
 
+        // Captured before the pipeline runs: the hosting Activity (and therefore the trace the
+        // application's own spans belong to) is current for the whole request.
+        var (traceId, spanId) = TelemetryContext.CurrentSpan();
+
         var stopwatch = Stopwatch.StartNew();
         var originalBody = context.Response.Body;
         ResponseCaptureStream? capture = null;
@@ -77,6 +81,8 @@ public sealed class HttpCaptureMiddleware
             AddAndSend(new TelemetryEvent
             {
                 RequestId = requestId,
+                TraceId = traceId,
+                SpanId = spanId,
                 Type = "exception",
                 Method = context.Request.Method,
                 Path = context.Request.Path,
@@ -102,6 +108,8 @@ public sealed class HttpCaptureMiddleware
             {
                 Id = requestId,
                 RequestId = requestId,
+                TraceId = traceId,
+                SpanId = spanId,
                 Type = "http",
                 Method = context.Request.Method,
                 Path = context.Request.Path,

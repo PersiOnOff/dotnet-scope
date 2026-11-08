@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace DevDashboard.Core.Storage;
 
 /// <summary>
@@ -13,5 +15,18 @@ public static class TelemetryContext
     {
         get => Current.Value;
         set => Current.Value = value;
+    }
+
+    /// <summary>
+    /// W3C identifiers of the ambient <see cref="Activity"/>. OpenTelemetry in .NET is built on
+    /// <see cref="Activity"/>, so this needs no OpenTelemetry package: any span processor that
+    /// creates an Activity is correlated automatically.
+    /// </summary>
+    public static (string? TraceId, string? SpanId) CurrentSpan()
+    {
+        var activity = Activity.Current;
+        return activity is null
+            ? (null, null)
+            : (activity.TraceId.ToHexString(), activity.SpanId.ToHexString());
     }
 }

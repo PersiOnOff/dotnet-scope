@@ -18,7 +18,8 @@ public static class DashboardApiEndpoints
             string? type = null,
             string? q = null,
             long? minDurationMs = null,
-            int? limit = null) => Results.Ok(Query(store.GetAll(), type, q, minDurationMs, limit)));
+            int? limit = null,
+            string? traceId = null) => Results.Ok(Query(store.GetAll(), type, q, minDurationMs, limit, traceId)));
 
         group.MapGet("/events/{type}", (string type, ITelemetryStore store) =>
             Results.Ok(store.GetByType(type)));
@@ -58,9 +59,15 @@ public static class DashboardApiEndpoints
         string? type,
         string? q,
         long? minDurationMs,
-        int? limit)
+        int? limit,
+        string? traceId = null)
     {
         IEnumerable<TelemetryEvent> query = events;
+
+        if (!string.IsNullOrWhiteSpace(traceId))
+        {
+            query = query.Where(e => string.Equals(e.TraceId, traceId, StringComparison.OrdinalIgnoreCase));
+        }
 
         if (!string.IsNullOrWhiteSpace(type) && !string.Equals(type, "all", StringComparison.OrdinalIgnoreCase))
         {

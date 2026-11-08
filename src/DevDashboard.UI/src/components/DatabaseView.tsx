@@ -82,7 +82,7 @@ export default function DatabaseView({ sources, loaded, onRefresh }: Props) {
                   onClick={() => setSelected({ source: table.source, table: table.name })}
                   title={table.schema ? `${table.schema}.${table.name}` : table.name}
                   className={`flex w-full items-center gap-2 px-4 py-1.5 text-left font-mono text-[12px] transition ${
-                    isSelected ? 'bg-indigo-500/10 text-indigo-300' : 'text-slate-400 hover:bg-slate-900'
+                    isSelected ? 'bg-indigo-500/10 text-indigo-300' : 'text-slate-400 hover:bg-slate-800/50'
                   }`}
                 >
                   <span className="truncate">{table.name}</span>
@@ -165,9 +165,9 @@ function TableGrid({ page }: { page: TablePage }) {
           </tr>
         ) : (
           page.rows.map((row, index) => (
-            <tr key={index} className="hover:bg-slate-900/60">
+            <tr key={index} className="hover:bg-slate-800/40">
               {row.map((value, cell) => (
-                <td key={cell} className="max-w-[30rem] truncate border-b border-slate-900/60 px-3 py-1.5 text-slate-300">
+                <td key={cell} className="max-w-[30rem] truncate border-b border-slate-800/60 px-3 py-1.5 text-slate-300">
                   {value === null ? <span className="italic text-slate-600">{t.db.nullValue}</span> : String(value)}
                 </td>
               ))}

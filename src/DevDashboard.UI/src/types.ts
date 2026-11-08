@@ -3,6 +3,8 @@ export type EventType = 'http' | 'sql' | 'log' | 'exception'
 export type TelemetryEvent = {
   id: string
   requestId?: string | null
+  traceId?: string | null
+  spanId?: string | null
   timestamp: string
   type: EventType
   method?: string | null

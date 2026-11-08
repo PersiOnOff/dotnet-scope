@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using DevDashboard.Core.Extensions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,23 @@ builder.Services.AddDevDashboard(options =>
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=sample.db"));
 
 var app = builder.Build();
+
+// Stands in for OpenTelemetry: an ActivitySource plus a listener is all DotNetScope needs to
+// stamp every event with a W3C trace id. With OpenTelemetry installed, its ASP.NET Core
+// instrumentation creates this activity for you and the ids line up with your exporter.
+using var activityListener = new ActivityListener
+{
+    ShouldListenTo = source => source.Name == "SampleWebApi",
+    Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+};
+ActivitySource.AddActivityListener(activityListener);
+var telemetry = new ActivitySource("SampleWebApi");
+
+app.Use(async (context, next) =>
+{
+    using var activity = telemetry.StartActivity($"{context.Request.Method} {context.Request.Path}");
+    await next();
+});
 
 app.UseDevDashboard();
 

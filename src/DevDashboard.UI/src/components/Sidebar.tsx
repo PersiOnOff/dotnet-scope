@@ -1,5 +1,6 @@
 import type { EventType } from '../types'
 import type { ConnectionStatus } from '../hooks/useTelemetry'
+import type { Theme } from '../hooks/useTheme'
 import { useI18n, type Locale } from '../i18n'
 
 type Tab = EventType | 'all'
@@ -26,11 +27,24 @@ type Props = {
   counts: Record<string, number>
   status: ConnectionStatus
   paused: boolean
+  theme: Theme
   onChange: (id: Tab) => void
   onView: (view: 'events' | 'database') => void
+  onTheme: (theme: Theme) => void
 }
 
-export default function Sidebar({ active, view, hasDatabase, counts, status, paused, onChange, onView }: Props) {
+export default function Sidebar({
+  active,
+  view,
+  hasDatabase,
+  counts,
+  status,
+  paused,
+  theme,
+  onChange,
+  onView,
+  onTheme,
+}: Props) {
   const { t, locale, setLocale } = useI18n()
 
   const tabs: { id: Tab; label: string }[] = [
@@ -63,7 +77,7 @@ export default function Sidebar({ active, view, hasDatabase, counts, status, pau
               className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition ${
                 isActive
                   ? 'bg-slate-800/80 text-slate-100'
-                  : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
               }`}
             >
               <span className={`w-4 text-center font-mono ${isActive ? 'text-indigo-300' : 'text-slate-600'}`}>{ICONS[tab.id]}</span>
@@ -83,7 +97,7 @@ export default function Sidebar({ active, view, hasDatabase, counts, status, pau
               className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition ${
                 view === 'database'
                   ? 'bg-slate-800/80 text-slate-100'
-                  : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
               }`}
             >
               <span className={`w-4 text-center font-mono ${view === 'database' ? 'text-indigo-300' : 'text-slate-600'}`}>⌸</span>
@@ -94,6 +108,25 @@ export default function Sidebar({ active, view, hasDatabase, counts, status, pau
       </nav>
 
       <div className="mt-auto space-y-3 border-t border-slate-800 px-5 py-4">
+        <div className="flex items-center justify-between text-[11px] text-slate-600">
+          <span>{t.theme.label}</span>
+          <div className="flex items-center gap-0.5 rounded-md border border-slate-800 p-0.5">
+            {(['light', 'dark'] as Theme[]).map(mode => (
+              <button
+                key={mode}
+                onClick={() => onTheme(mode)}
+                title={mode === 'light' ? t.theme.toLight : t.theme.toDark}
+                aria-label={mode === 'light' ? t.theme.toLight : t.theme.toDark}
+                className={`rounded px-1.5 py-0.5 transition ${
+                  theme === mode ? 'bg-slate-800 text-slate-200' : 'text-slate-600 hover:text-slate-400'
+                }`}
+              >
+                {mode === 'light' ? '☀' : '☾'}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="flex items-center justify-between text-[11px] text-slate-600">
           <span>{t.language.label}</span>
           <div className="flex items-center gap-0.5 rounded-md border border-slate-800 p-0.5">

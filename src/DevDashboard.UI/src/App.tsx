@@ -5,6 +5,7 @@ import EventList from './components/EventList'
 import EventDetails from './components/EventDetails'
 import DatabaseView from './components/DatabaseView'
 import { useTelemetry } from './hooks/useTelemetry'
+import { useTheme } from './hooks/useTheme'
 import { loadSavedFilters, matchesFilter, persistSavedFilters, sortEvents } from './lib/filters'
 import { API } from './lib/format'
 import type { DataSourceInfo, EventType, SavedFilter, SortMode, TelemetryEvent } from './types'
@@ -14,6 +15,7 @@ type View = 'events' | 'database'
 
 export default function App() {
   const { events, status, paused, setPaused, clear } = useTelemetry()
+  const { theme, setTheme } = useTheme()
   const [view, setView] = useState<View>('events')
   const [tab, setTab] = useState<Tab>('all')
   const [search, setSearch] = useState('')
@@ -114,11 +116,13 @@ export default function App() {
         counts={counts}
         status={status}
         paused={paused}
+        theme={theme}
         onChange={id => {
           setTab(id)
           setView('events')
         }}
         onView={setView}
+        onTheme={setTheme}
       />
 
       <main className="flex min-w-0 flex-1 flex-col">
@@ -161,6 +165,10 @@ export default function App() {
                 all={events}
                 onSelect={event => setSelectedId(event.id)}
                 onClose={() => setSelectedId(null)}
+                onFilterTrace={traceId => {
+                  setSearch(traceId)
+                  setView('events')
+                }}
               />
             </div>
           </>

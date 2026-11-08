@@ -67,9 +67,12 @@ public class DashboardLoggerProvider : ILoggerProvider
         {
             if (!IsEnabled(logLevel)) return;
 
+            var (traceId, spanId) = TelemetryContext.CurrentSpan();
             var evt = new TelemetryEvent
             {
                 RequestId = TelemetryContext.RequestId,
+                TraceId = traceId,
+                SpanId = spanId,
                 Type = "log",
                 LogLevel = logLevel.ToString(),
                 Category = _category,

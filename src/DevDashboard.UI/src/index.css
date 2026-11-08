@@ -2,6 +2,88 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Colour tokens. The dark palette is the original one; `.light` on <html> swaps every value,
+ * which is why components only ever reference the slate and indigo tokens and never a theme name.
+ */
+:root {
+  color-scheme: dark;
+
+  --slate-100: 241 245 249;
+  --slate-200: 226 232 240;
+  --slate-300: 203 213 225;
+  --slate-400: 148 163 184;
+  --slate-500: 100 116 139;
+  --slate-600: 71 85 105;
+  --slate-700: 51 65 85;
+  --slate-800: 30 41 59;
+  --slate-900: 15 23 42;
+  --slate-950: 2 6 23;
+
+  --indigo-300: 165 180 252;
+  --indigo-400: 129 140 248;
+  --indigo-500: 99 102 241;
+
+  --violet-300: 196 181 253;
+  --violet-400: 167 139 250;
+  --violet-500: 139 92 246;
+
+  --sky-300: 125 211 252;
+  --sky-400: 56 189 248;
+  --sky-500: 14 165 233;
+
+  --emerald-300: 110 231 183;
+  --emerald-400: 52 211 153;
+
+  --amber-300: 252 211 77;
+  --amber-400: 251 191 36;
+  --amber-500: 245 158 11;
+
+  --rose-200: 254 205 211;
+  --rose-300: 253 164 175;
+  --rose-400: 251 113 133;
+  --rose-500: 244 63 94;
+}
+
+html.light {
+  color-scheme: light;
+
+  --slate-100: 2 6 23;
+  --slate-200: 15 23 42;
+  --slate-300: 30 41 59;
+  --slate-400: 51 65 85;
+  --slate-500: 71 85 105;
+  --slate-600: 100 116 139;
+  --slate-700: 203 213 225;
+  --slate-800: 226 232 240;
+  --slate-900: 255 255 255;
+  --slate-950: 248 250 252;
+
+  --indigo-300: 67 56 202;
+  --indigo-400: 79 70 229;
+  --indigo-500: 99 102 241;
+
+  --violet-300: 109 40 217;
+  --violet-400: 124 58 237;
+  --violet-500: 139 92 246;
+
+  --sky-300: 3 105 161;
+  --sky-400: 2 132 199;
+  --sky-500: 14 165 233;
+
+  --emerald-300: 4 120 87;
+  --emerald-400: 5 150 105;
+
+  --amber-300: 180 83 9;
+  --amber-400: 217 119 6;
+  --amber-500: 245 158 11;
+
+  --rose-200: 159 18 57;
+  --rose-300: 190 18 60;
+  --rose-400: 225 29 72;
+  --rose-500: 244 63 94;
+}
+
 html,
 body,
 #root {
@@ -10,17 +92,19 @@ body,
 
 body {
   margin: 0;
+  background: rgb(var(--slate-950));
+  color: rgb(var(--slate-200));
   font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: rgb(99 102 241 / 0.35);
+  background: rgb(var(--indigo-500) / 0.35);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #1e293b transparent;
+  scrollbar-color: rgb(var(--slate-800)) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -29,7 +113,7 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: rgb(var(--slate-800));
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;

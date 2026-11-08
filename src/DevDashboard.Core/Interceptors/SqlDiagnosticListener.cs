@@ -79,9 +79,12 @@ public sealed class SqlDiagnosticListener : IObserver<DiagnosticListener>, IDisp
                 var duration = (TimeSpan?)type.GetProperty("Duration", BindingFlags.Public | BindingFlags.Instance)
                     ?.GetValue(payload) ?? TimeSpan.Zero;
 
+                var (traceId, spanId) = TelemetryContext.CurrentSpan();
                 var evt = new TelemetryEvent
                 {
                     RequestId = TelemetryContext.RequestId,
+                    TraceId = traceId,
+                    SpanId = spanId,
                     Type = "sql",
                     DurationMs = (long)duration.TotalMilliseconds,
                     Sql = command?.CommandText,

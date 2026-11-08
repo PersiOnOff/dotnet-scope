@@ -11,6 +11,12 @@ public class TelemetryEvent
     /// <summary>Correlation id of the HTTP request this event happened during, when any.</summary>
     public Guid? RequestId { get; set; }
 
+    /// <summary>W3C trace id of the <see cref="System.Diagnostics.Activity"/> that was current, when any.</summary>
+    public string? TraceId { get; set; }
+
+    /// <summary>W3C span id of the <see cref="System.Diagnostics.Activity"/> that was current, when any.</summary>
+    public string? SpanId { get; set; }
+
     /// <summary>UTC timestamp of the event.</summary>
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 

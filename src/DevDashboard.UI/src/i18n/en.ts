@@ -22,6 +22,7 @@ export const en = {
   },
 
   language: { label: 'Language' },
+  theme: { label: 'Theme', light: 'Light', dark: 'Dark', toLight: 'Switch to light theme', toDark: 'Switch to dark theme' },
   privacy: 'Everything is captured in memory and never leaves this process.',
 
   toolbar: {
@@ -73,6 +74,8 @@ export const en = {
     partOfRequest: 'Part of request',
     category: 'Category',
     eventId: 'Event id',
+    trace: 'Trace',
+    filterByTrace: 'Filter by trace',
     copy: 'copy',
     copied: 'copied',
     copyFrame: 'Copy frame',

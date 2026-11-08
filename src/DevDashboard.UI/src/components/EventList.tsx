@@ -46,8 +46,8 @@ export default function EventList({ events, total, hasFilter, selectedId, childC
               key={event.id}
               onClick={() => onSelect(event)}
               title={summary}
-              className={`${ROW} w-full border-b border-slate-900/80 py-2 text-left text-sm transition ${
-                isSelected ? 'bg-indigo-500/10' : 'hover:bg-slate-900/70'
+              className={`${ROW} w-full border-b border-slate-800/60 py-2 text-left text-sm transition ${
+                isSelected ? 'bg-indigo-500/10' : 'hover:bg-slate-800/40'
               }`}
             >
               <span className="font-mono text-[11px] text-slate-500">{formatTime(event.timestamp)}</span>

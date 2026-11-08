@@ -17,6 +17,7 @@ export function toMarkdown(request: TelemetryEvent, related: TelemetryEvent[], t
   lines.push(`### ${request.method ?? 'REQUEST'} ${request.path ?? ''}${status}${duration}`.trim())
   lines.push('')
   lines.push(`_${request.timestamp}_`)
+  if (request.traceId) lines.push('', `trace: \`${request.traceId}\``)
 
   if (request.requestBody) {
     lines.push('', `#### ${t.markdown.requestBody}`, fence('', prettyJson(request.requestBody) ?? request.requestBody))

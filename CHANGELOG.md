@@ -16,6 +16,8 @@ All notable changes to this project are documented here. The format follows
 - Russian README (`README.ru.md`) with a language switch at the top of both files.
 - Database tab: register an ADO.NET connection with `options.AddDataSource(...)` and browse its tables and first rows read-only. Table discovery uses the provider catalog (SQLite, SQL Server, `GetSchema` fallback); identifiers are quoted only after matching that catalog.
 - `GET /_dashboard/api/db` and `GET /_dashboard/api/db/{source}/{table}?limit=`.
+- Light theme: every colour is a CSS variable, so the palette swaps with one class on `<html>`. Follows `prefers-color-scheme` until the sidebar switch is used, and the choice is remembered. No flash of the wrong theme on load.
+- Trace correlation: `TelemetryEvent.TraceId`/`SpanId` are filled from `Activity.Current`, so events line up with OpenTelemetry traces without an OpenTelemetry dependency. The details pane shows the trace and filters the stream by it; the API accepts `?traceId=`.
 
 ## [0.1.0] - 2026-11-08
 

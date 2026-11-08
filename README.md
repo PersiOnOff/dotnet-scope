@@ -45,6 +45,8 @@ DotNetScope is not a replacement for production observability. It is the thing y
 - **Live over SignalR** — pause the stream when a noisy endpoint floods the list.
 - **Database tab** — browse the tables of any ADO.NET connection you register, read-only, without leaving the dashboard.
 - **English and Russian UI** — follows your browser language, one click in the sidebar to switch.
+- **Dark and light themes** — follows your OS, switchable in the sidebar, remembered.
+- **Trace correlation** — every event carries the W3C `trace_id`/`span_id` of the ambient `Activity`, with no OpenTelemetry dependency.
 - **Local-only by default** — remote access is opt-in, because this data is sensitive.
 - **Nothing to configure** — the UI is embedded in the assembly and served from `/_dashboard`.
 
@@ -120,7 +122,7 @@ Everything the UI shows is also available as JSON, so you can script it in CI or
 
 | Endpoint | Purpose |
 |---|---|
-| `GET /_dashboard/api/events?type=&q=&minDurationMs=&limit=` | filtered event list |
+| `GET /_dashboard/api/events?type=&q=&minDurationMs=&limit=&traceId=` | filtered event list |
 | `GET /_dashboard/api/requests/{id}` | one request with its SQL, logs and exceptions |
 | `GET /_dashboard/api/info` | version and retained event count |
 | `DELETE /_dashboard/api/events` | clear the in-memory buffer |
@@ -157,6 +159,25 @@ The UI follows your browser language and remembers an explicit choice. English a
 Adding a language is one file: copy [`src/DevDashboard.UI/src/i18n/en.ts`](src/DevDashboard.UI/src/i18n/en.ts), translate it, and register the locale in `i18n/index.tsx`. The Russian dictionary is typed against the English one, so a missing key is a compile error instead of a stray English string at runtime; plural forms are per-language (1 событие / 2 события / 5 событий).
 
 This README is also available in Russian: [README.ru.md](README.ru.md).
+
+## Themes
+
+Dark and light are the same components: every colour is a CSS variable, so switching the theme is one class on `<html>` instead of a second set of classes in every file. The theme follows `prefers-color-scheme` until you pick one in the sidebar, and the choice is remembered.
+
+<p align="center">
+  <img src="docs/screenshots/dashboard-light.png" width="85%" alt="Light theme" />
+</p>
+
+## Tracing
+
+DotNetScope reads `Activity.Current` — the primitive that OpenTelemetry .NET is built on — and stamps every event with the W3C `trace_id` and `span_id` of the span that was active. There is no OpenTelemetry dependency: if your application already exports traces, the ids in the dashboard are the ids your backend sees.
+
+```csharp
+using var activity = telemetry.StartActivity("checkout");
+// the request, its SQL and its logs now carry this trace id
+```
+
+The details pane shows the trace and offers **Filter by trace**; the API accepts `?traceId=`. With no listener there is no ambient `Activity`, and the events simply have no trace id — nothing else changes.
 
 ## How it works
 
@@ -220,8 +241,10 @@ tests/DevDashboard.Tests integration and unit tests (real Kestrel host)
 - [x] Export a request (with its SQL and logs) as a shareable JSON/markdown block
 - [x] Saved filters and a “slowest requests” view
 - [x] Database tab: browse tables of a SQLite/SQL Server connection
-- [ ] Light theme
-- [ ] OpenTelemetry span correlation
+- [x] Light theme
+- [x] OpenTelemetry span correlation
+- [ ] Request replay from the dashboard
+- [ ] Persist a session to disk so it survives a restart
 
 Ideas and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 

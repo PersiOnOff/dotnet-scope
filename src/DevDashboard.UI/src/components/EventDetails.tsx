@@ -19,9 +19,10 @@ type Props = {
   all: TelemetryEvent[]
   onSelect: (event: TelemetryEvent) => void
   onClose: () => void
+  onFilterTrace: (traceId: string) => void
 }
 
-export default function EventDetails({ event, all, onSelect, onClose }: Props) {
+export default function EventDetails({ event, all, onSelect, onClose, onFilterTrace }: Props) {
   const { t, locale } = useI18n()
 
   const children = useMemo(
@@ -133,7 +134,7 @@ export default function EventDetails({ event, all, onSelect, onClose }: Props) {
                   <button
                     key={child.id}
                     onClick={() => onSelect(child)}
-                    className="flex w-full items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/60 px-2.5 py-1.5 text-left hover:border-slate-700 hover:bg-slate-900"
+                    className="flex w-full items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/60 px-2.5 py-1.5 text-left hover:border-slate-700 hover:bg-slate-800/50"
                   >
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${TYPE_STYLE[child.type].dot}`} />
                     <span className="truncate font-mono text-[12px] text-slate-400">{summarize(child)}</span>
@@ -159,6 +160,22 @@ export default function EventDetails({ event, all, onSelect, onClose }: Props) {
               </span>
               <span className={`ml-auto font-mono text-[11px] ${statusTone(parent.statusCode)}`}>{parent.statusCode}</span>
             </button>
+          </Block>
+        )}
+
+        {event.traceId && (
+          <Block title={t.details.trace} copy={event.spanId ? `${event.traceId}/${event.spanId}` : event.traceId}>
+            <div className="flex items-start gap-2">
+              <div className="min-w-0 flex-1">
+                <Code>{event.spanId ? `${event.traceId} · ${event.spanId}` : event.traceId}</Code>
+              </div>
+              <button
+                onClick={() => onFilterTrace(event.traceId ?? '')}
+                className="shrink-0 rounded-lg border border-slate-800 bg-slate-950/80 px-2 py-1 text-[11px] text-slate-400 transition hover:border-indigo-500/40 hover:text-indigo-300"
+              >
+                {t.details.filterByTrace}
+              </button>
+            </div>
           </Block>
         )}
 

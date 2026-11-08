@@ -38,7 +38,8 @@ export function matchesFilter(event: TelemetryEvent, filter: Pick<FilterState, '
     (event.parameters ?? '').toLowerCase().includes(term) ||
     (event.message ?? '').toLowerCase().includes(term) ||
     (event.category ?? '').toLowerCase().includes(term) ||
-    (event.responseBody ?? '').toLowerCase().includes(term)
+    (event.responseBody ?? '').toLowerCase().includes(term) ||
+    (event.traceId ?? '').toLowerCase().includes(term)
   )
 }
 

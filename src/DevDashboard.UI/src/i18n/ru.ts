@@ -33,6 +33,7 @@ export const ru: Messages = {
   },
 
   language: { label: 'Язык' },
+  theme: { label: 'Тема', light: 'Светлая', dark: 'Тёмная', toLight: 'Светлая тема', toDark: 'Тёмная тема' },
   privacy: 'Всё хранится в памяти и не покидает процесс.',
 
   toolbar: {
@@ -84,6 +85,8 @@ export const ru: Messages = {
     partOfRequest: 'Часть запроса',
     category: 'Категория',
     eventId: 'ID события',
+    trace: 'Трассировка',
+    filterByTrace: 'Фильтр по трассе',
     copy: 'копировать',
     copied: 'скопировано',
     copyFrame: 'Скопировать кадр',
