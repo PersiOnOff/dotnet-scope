@@ -43,6 +43,7 @@ DotNetScope is not a replacement for production observability. It is the thing y
 - **Exceptions that make sense** — message, stack frames highlighted, one click to copy a frame.
 - **Bodies on demand** — request and response bodies, JSON pretty-printed.
 - **Live over SignalR** — pause the stream when a noisy endpoint floods the list.
+- **Database tab** — browse the tables of any ADO.NET connection you register, read-only, without leaving the dashboard.
 - **English and Russian UI** — follows your browser language, one click in the sidebar to switch.
 - **Local-only by default** — remote access is opt-in, because this data is sensitive.
 - **Nothing to configure** — the UI is embedded in the assembly and served from `/_dashboard`.
@@ -123,6 +124,27 @@ Everything the UI shows is also available as JSON, so you can script it in CI or
 | `GET /_dashboard/api/requests/{id}` | one request with its SQL, logs and exceptions |
 | `GET /_dashboard/api/info` | version and retained event count |
 | `DELETE /_dashboard/api/events` | clear the in-memory buffer |
+| `GET /_dashboard/api/db` | registered data sources and their tables |
+| `GET /_dashboard/api/db/{source}/{table}?limit=` | a page of rows from one table |
+
+## Database tab
+
+Register a connection and browse its tables without leaving the dashboard. The package never references a provider — you hand it a factory, so the connection string stays in your app:
+
+```csharp
+builder.Services.AddDevDashboard(options =>
+{
+    options.AddDataSource("app", () => new SqliteConnection("Data Source=app.db"));
+});
+```
+
+<p align="center">
+  <img src="docs/screenshots/database.png" width="85%" alt="Database tab" />
+</p>
+
+Read-only by design: table names come from the provider's own catalog (`sqlite_master` for SQLite, `INFORMATION_SCHEMA` for SQL Server, `GetSchema` for everything else), a page of rows is read with a hard limit, and an identifier is only quoted after it matched that catalog.
+
+SQL Server goes through the same path — register `() => new SqlConnection(connectionString)` and the tab lists `INFORMATION_SCHEMA.TABLES`. The test suite covers SQLite.
 
 ## Localization
 
@@ -197,7 +219,7 @@ tests/DevDashboard.Tests integration and unit tests (real Kestrel host)
 
 - [x] Export a request (with its SQL and logs) as a shareable JSON/markdown block
 - [x] Saved filters and a “slowest requests” view
-- [ ] Database tab: browse tables of a SQLite/SQL Server connection
+- [x] Database tab: browse tables of a SQLite/SQL Server connection
 - [ ] Light theme
 - [ ] OpenTelemetry span correlation
 

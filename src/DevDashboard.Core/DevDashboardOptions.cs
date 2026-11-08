@@ -1,3 +1,6 @@
+using System.Data.Common;
+using DevDashboard.Core.Database;
+
 namespace DevDashboard.Core;
 
 /// <summary>
@@ -68,4 +71,25 @@ public sealed class DevDashboardOptions
     /// add your own noisy framework categories here.
     /// </summary>
     public IList<string> ExcludedCategories { get; } = new List<string>(DevDashboardDefaults.NoiseCategories);
+
+    /// <summary>
+    /// Databases the dashboard may browse in its Database tab. Empty by default: the dashboard
+    /// never guesses a connection string.
+    /// </summary>
+    public IList<DevDashboardDataSource> DataSources { get; } = new List<DevDashboardDataSource>();
+
+    /// <summary>
+    /// Registers a database for the Database tab. The factory is called once per query, so the
+    /// connection string stays in the application, not in the package.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// options.AddDataSource("app", () => new SqliteConnection("Data Source=app.db"));
+    /// </code>
+    /// </example>
+    public DevDashboardOptions AddDataSource(string name, Func<DbConnection> connectionFactory)
+    {
+        DataSources.Add(new DevDashboardDataSource(name, connectionFactory));
+        return this;
+    }
 }

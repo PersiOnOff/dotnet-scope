@@ -14,6 +14,8 @@ All notable changes to this project are documented here. The format follows
 - “Slowest first” sort order for the event stream.
 - Russian UI next to English: the language follows the browser, can be switched in the sidebar, and is remembered. Dictionaries are typed against the English one, so a missing key fails the build; plural forms are language-specific.
 - Russian README (`README.ru.md`) with a language switch at the top of both files.
+- Database tab: register an ADO.NET connection with `options.AddDataSource(...)` and browse its tables and first rows read-only. Table discovery uses the provider catalog (SQLite, SQL Server, `GetSchema` fallback); identifiers are quoted only after matching that catalog.
+- `GET /_dashboard/api/db` and `GET /_dashboard/api/db/{source}/{table}?limit=`.
 
 ## [0.1.0] - 2026-11-08
 

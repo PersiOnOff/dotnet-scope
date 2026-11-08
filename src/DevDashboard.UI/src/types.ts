@@ -32,3 +32,20 @@ export type SavedFilter = FilterState & {
   id: string
   name: string
 }
+
+export type TableInfo = {
+  source: string
+  schema: string
+  name: string
+}
+
+export type DataSourceInfo = {
+  name: string
+  tables: TableInfo[]
+}
+
+export type TablePage = {
+  columns: string[]
+  rows: (string | number | boolean | null)[][]
+  truncated: boolean
+}

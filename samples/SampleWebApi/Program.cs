@@ -1,4 +1,5 @@
 using DevDashboard.Core.Extensions;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using SampleWebApi.Data;
 
@@ -14,6 +15,10 @@ builder.Services.AddDevDashboard(options =>
     // Allow other machines/containers to reach the dashboard. Off by default on purpose.
     options.AllowRemoteAccess = false;
     options.MaxEvents = 1000;
+
+    // The Database tab browses whatever the application registers; the package itself
+    // never references a provider.
+    options.AddDataSource("sample.db", () => new SqliteConnection("Data Source=sample.db"));
 });
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=sample.db"));

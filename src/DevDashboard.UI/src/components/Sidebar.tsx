@@ -21,13 +21,16 @@ const STATUS_TONE: Record<ConnectionStatus, string> = {
 
 type Props = {
   active: Tab
+  view: 'events' | 'database'
+  hasDatabase: boolean
   counts: Record<string, number>
   status: ConnectionStatus
   paused: boolean
   onChange: (id: Tab) => void
+  onView: (view: 'events' | 'database') => void
 }
 
-export default function Sidebar({ active, counts, status, paused, onChange }: Props) {
+export default function Sidebar({ active, view, hasDatabase, counts, status, paused, onChange, onView }: Props) {
   const { t, locale, setLocale } = useI18n()
 
   const tabs: { id: Tab; label: string }[] = [
@@ -52,7 +55,7 @@ export default function Sidebar({ active, counts, status, paused, onChange }: Pr
 
       <nav className="flex flex-col gap-0.5 px-3">
         {tabs.map(tab => {
-          const isActive = active === tab.id
+          const isActive = view === 'events' && active === tab.id
           return (
             <button
               key={tab.id}
@@ -71,6 +74,23 @@ export default function Sidebar({ active, counts, status, paused, onChange }: Pr
             </button>
           )
         })}
+
+        {hasDatabase && (
+          <>
+            <div className="my-2 border-t border-slate-800" />
+            <button
+              onClick={() => onView('database')}
+              className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition ${
+                view === 'database'
+                  ? 'bg-slate-800/80 text-slate-100'
+                  : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+              }`}
+            >
+              <span className={`w-4 text-center font-mono ${view === 'database' ? 'text-indigo-300' : 'text-slate-600'}`}>⌸</span>
+              <span className="flex-1">{t.nav.database}</span>
+            </button>
+          </>
+        )}
       </nav>
 
       <div className="mt-auto space-y-3 border-t border-slate-800 px-5 py-4">

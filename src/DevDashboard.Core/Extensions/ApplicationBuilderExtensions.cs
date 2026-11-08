@@ -79,5 +79,6 @@ public static class ApplicationBuilderExtensions
     {
         endpoints.MapHub<DashboardHub>(DevDashboardDefaults.HubPath);
         endpoints.MapDashboardApi();
+        endpoints.MapDatabaseApi();
     }
 }

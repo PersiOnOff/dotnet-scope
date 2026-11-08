@@ -8,6 +8,7 @@ export const en = {
     sql: 'SQL',
     log: 'Logs',
     exception: 'Exceptions',
+    database: 'Database',
   },
 
   types: { http: 'HTTP', sql: 'SQL', log: 'LOG', exception: 'ERR' },
@@ -86,6 +87,24 @@ export const en = {
     sql: 'SQL',
     logs: 'Logs',
     exception: 'Exception',
+  },
+
+  db: {
+    title: 'Database',
+    tables: 'Tables',
+    subtitle: 'Read-only, first rows only',
+    noSourcesTitle: 'No data sources registered',
+    noSourcesBody: 'Register one where the dashboard is configured:',
+    noSourcesCode: 'options.AddDataSource("app", () => new SqliteConnection(...))',
+    selectTable: 'Select a table on the left.',
+    loading: 'Loading…',
+    refresh: 'Refresh',
+    limit: 'Rows',
+    rows: (count: number) => `${count} ${count === 1 ? 'row' : 'rows'}`,
+    truncated: 'limit reached',
+    emptyTable: 'This table has no rows.',
+    errorTitle: 'Could not read the table',
+    nullValue: 'NULL',
   },
 }
 

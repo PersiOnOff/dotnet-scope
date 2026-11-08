@@ -19,6 +19,7 @@ export const ru: Messages = {
     sql: 'SQL',
     log: 'Логи',
     exception: 'Исключения',
+    database: 'База данных',
   },
 
   types: { http: 'HTTP', sql: 'SQL', log: 'ЛОГ', exception: 'ОШБ' },
@@ -97,5 +98,23 @@ export const ru: Messages = {
     sql: 'SQL',
     logs: 'Логи',
     exception: 'Исключение',
+  },
+
+  db: {
+    title: 'База данных',
+    tables: 'Таблицы',
+    subtitle: 'Только чтение, только первые строки',
+    noSourcesTitle: 'Нет подключённых баз',
+    noSourcesBody: 'Зарегистрируйте подключение там, где настраивается дашборд:',
+    noSourcesCode: 'options.AddDataSource("app", () => new SqliteConnection(...))',
+    selectTable: 'Выберите таблицу слева.',
+    loading: 'Загрузка…',
+    refresh: 'Обновить',
+    limit: 'Строк',
+    rows: (count: number) => `${count} ${plural(count, 'строка', 'строки', 'строк')}`,
+    truncated: 'достигнут лимит',
+    emptyTable: 'В таблице нет строк.',
+    errorTitle: 'Не удалось прочитать таблицу',
+    nullValue: 'NULL',
   },
 }
