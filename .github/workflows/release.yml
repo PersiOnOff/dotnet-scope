@@ -36,6 +36,7 @@ jobs:
         working-directory: src/DevDashboard.UI
         run: |
           npm ci
+          npm run typecheck
           npm run build
 
       - name: Build

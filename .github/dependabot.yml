@@ -10,14 +10,45 @@ updates:
         patterns:
           - 'Microsoft.*'
           - 'System.*'
+      test-tooling:
+        patterns:
+          - 'NUnit*'
+          - 'coverlet.*'
 
   - package-ecosystem: npm
     directory: /src/DevDashboard.UI
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      react:
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - '@types/react'
+          - '@types/react-dom'
+      # Vite, its React plugin and TypeScript are upgraded by hand: a major of one of them
+      # only makes sense together with the others, and the type check has to be re-run.
+      build-tooling:
+        patterns:
+          - 'tailwindcss'
+          - 'postcss'
+          - 'autoprefixer'
+    ignore:
+      - dependency-name: 'vite'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@vitejs/plugin-react'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@microsoft/signalr'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    groups:
+      actions:
+        patterns:
+          - '*'
