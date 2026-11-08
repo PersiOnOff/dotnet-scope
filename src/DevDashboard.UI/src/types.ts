@@ -19,8 +19,16 @@ export type TelemetryEvent = {
   exception?: string | null
 }
 
-export type Filter = {
+export type SortMode = 'newest' | 'slowest'
+
+export type FilterState = {
   type: EventType | 'all'
   search: string
   minDurationMs: number
+  sort: SortMode
+}
+
+export type SavedFilter = FilterState & {
+  id: string
+  name: string
 }

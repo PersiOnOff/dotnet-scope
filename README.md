@@ -34,7 +34,9 @@ DotNetScope is not a replacement for production observability. It is the thing y
 
 - **One timeline, four event types** — requests, EF Core commands, `ILogger` records and unhandled exceptions, newest first.
 - **Request correlation** — every SQL command and log line is tagged with the request that produced it. Click the request, see its children.
-- **Search and filters** — free-text search across path, SQL, parameters and messages; filter by type and by duration (`> 100 ms`, `> 500 ms`, `> 1 s`).
+- **Search, filters, saved views** — free-text search across path, SQL, parameters and messages; filter by type and by duration (`> 100 ms`, `> 500 ms`, `> 1 s`); save a combination as a named chip that survives a reload.
+- **Slowest-first view** — sort the whole stream by duration to find the request that actually hurt.
+- **One-click export** — copy a request with its SQL, logs and stack trace as markdown for an issue, or as JSON for a script.
 - **SQL you can read** — syntax highlighting, parameters rendered separately from the command text.
 - **Exceptions that make sense** — message, stack frames highlighted, one click to copy a frame.
 - **Bodies on demand** — request and response bodies, JSON pretty-printed.
@@ -108,6 +110,17 @@ builder.Services.AddDevDashboard(options =>
 | `MaxBodyChars` | `4000` | Per-body character cap. |
 | `ExcludedCategories` | framework noise | Logger category prefixes that are ignored. |
 
+## JSON API
+
+Everything the UI shows is also available as JSON, so you can script it in CI or from a terminal:
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /_dashboard/api/events?type=&q=&minDurationMs=&limit=` | filtered event list |
+| `GET /_dashboard/api/requests/{id}` | one request with its SQL, logs and exceptions |
+| `GET /_dashboard/api/info` | version and retained event count |
+| `DELETE /_dashboard/api/events` | clear the in-memory buffer |
+
 ## How it works
 
 ```
@@ -167,8 +180,8 @@ tests/DevDashboard.Tests integration and unit tests (real Kestrel host)
 
 ## Roadmap
 
-- [ ] Export a request (with its SQL and logs) as a shareable JSON/markdown block
-- [ ] Saved filters and a “slowest requests” view
+- [x] Export a request (with its SQL and logs) as a shareable JSON/markdown block
+- [x] Saved filters and a “slowest requests” view
 - [ ] Database tab: browse tables of a SQLite/SQL Server connection
 - [ ] Light theme
 - [ ] OpenTelemetry span correlation

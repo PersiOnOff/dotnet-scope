@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using DevDashboard.Core;
+using DevDashboard.Core.Api;
 using DevDashboard.Core.Storage;
 
 namespace DevDashboard.Tests;
@@ -96,6 +97,33 @@ public class HttpCaptureTests
             Assert.That(miss, Is.Empty);
             Assert.That(tooSlow, Is.Empty);
         });
+    }
+
+    [Test]
+    public async Task Request_bundle_contains_the_request_and_its_children()
+    {
+        await using var app = await TestApp.StartAsync();
+        await app.Client.GetAsync("/api/log");
+
+        var http = app.Store.GetByType("http").Last();
+        var bundle = await app.Client.GetFromJsonAsync<RequestBundle>($"/_dashboard/api/requests/{http.Id}");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(bundle, Is.Not.Null);
+            Assert.That(bundle!.Request.Id, Is.EqualTo(http.Id));
+            Assert.That(bundle.Related.Select(e => e.Type), Is.EqualTo(new[] { "log" }));
+        });
+    }
+
+    [Test]
+    public async Task Request_bundle_is_404_for_an_unknown_id()
+    {
+        await using var app = await TestApp.StartAsync();
+
+        var response = await app.Client.GetAsync($"/_dashboard/api/requests/{Guid.NewGuid()}");
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
     }
 
     [Test]

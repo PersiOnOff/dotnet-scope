@@ -23,6 +23,9 @@ public static class DashboardApiEndpoints
         group.MapGet("/events/{type}", (string type, ITelemetryStore store) =>
             Results.Ok(store.GetByType(type)));
 
+        // One request plus everything it caused: the unit you want to paste into an issue.
+        group.MapGet("/requests/{id:guid}", (Guid id, ITelemetryStore store) => Bundle(id, store));
+
         group.MapDelete("/events", (ITelemetryStore store) =>
         {
             store.Clear();
@@ -35,6 +38,19 @@ public static class DashboardApiEndpoints
             version = typeof(DashboardApiEndpoints).Assembly.GetName().Version?.ToString() ?? "0.0.0",
             events = store.GetAll().Count,
         }));
+    }
+
+    private static IResult Bundle(Guid id, ITelemetryStore store)
+    {
+        var events = store.GetAll();
+        var request = events.FirstOrDefault(e => e.Id == id && e.Type == "http");
+        if (request is null) return Results.NotFound();
+
+        var related = events
+            .Where(e => e.RequestId == id && e.Id != id)
+            .ToList();
+
+        return Results.Ok(new RequestBundle(request, related));
     }
 
     internal static IReadOnlyList<TelemetryEvent> Query(

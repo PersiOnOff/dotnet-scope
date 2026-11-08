@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import type { TelemetryEvent } from '../types'
+import { toJsonExport, toMarkdown } from '../lib/export'
 import {
   TYPE_STYLE,
   durationTone,
@@ -29,6 +30,15 @@ export default function EventDetails({ event, all, onSelect, onClose }: Props) {
     () => (event?.requestId && event.type !== 'http' ? all.find(candidate => candidate.id === event.requestId) ?? null : null),
     [event, all],
   )
+
+  // Exporting a SQL or log event sends the whole request it belongs to: a lone SQL statement
+  // without its request is rarely what you want to paste into an issue.
+  const bundle = useMemo(() => {
+    if (!event) return null
+    const request = event.type === 'http' ? event : parent ?? event
+    const related = all.filter(candidate => candidate.requestId === request.id && candidate.id !== request.id)
+    return { request, related }
+  }, [event, parent, all])
 
   if (!event) {
     return (
@@ -159,6 +169,14 @@ export default function EventDetails({ event, all, onSelect, onClose }: Props) {
           <Code>{event.id}</Code>
         </Block>
       </div>
+
+      {bundle && (
+        <footer className="flex items-center gap-2 border-t border-slate-800 bg-slate-950/60 px-4 py-2">
+          <ExportButton label="Copy markdown" build={() => toMarkdown(bundle.request, bundle.related)} />
+          <ExportButton label="Copy JSON" build={() => toJsonExport(bundle.request, bundle.related)} />
+          <span className="ml-auto font-mono text-[11px] text-slate-600">{bundle.related.length + 1} events</span>
+        </footer>
+      )}
     </aside>
   )
 }
@@ -196,6 +214,29 @@ function Frame({ frame }: { frame: string }) {
     >
       <span className={`block truncate ${isFrame ? 'text-slate-400' : 'text-slate-500'}`}>{call}</span>
       {location && <span className="block truncate text-indigo-300/80">{location}</span>}
+    </button>
+  )
+}
+
+function ExportButton({ label, build }: { label: string; build: () => string }) {
+  const [copied, setCopied] = useState(false)
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(build())
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1200)
+    } catch {
+      // Clipboard access can be denied outside localhost; nothing else to do here.
+    }
+  }
+
+  return (
+    <button
+      onClick={copy}
+      className="rounded-lg border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-[11px] text-slate-300 transition hover:border-indigo-500/40 hover:text-indigo-300"
+    >
+      {copied ? 'copied ✓' : label}
     </button>
   )
 }

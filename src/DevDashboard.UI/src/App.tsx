@@ -4,8 +4,8 @@ import Toolbar from './components/Toolbar'
 import EventList from './components/EventList'
 import EventDetails from './components/EventDetails'
 import { useTelemetry } from './hooks/useTelemetry'
-import type { EventType, TelemetryEvent } from './types'
-import { summarize } from './lib/format'
+import { loadSavedFilters, matchesFilter, persistSavedFilters, sortEvents } from './lib/filters'
+import type { EventType, SavedFilter, SortMode, TelemetryEvent } from './types'
 
 type Tab = EventType | 'all'
 
@@ -14,6 +14,8 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('all')
   const [search, setSearch] = useState('')
   const [minDurationMs, setMinDurationMs] = useState(0)
+  const [sort, setSort] = useState<SortMode>('newest')
+  const [savedFilters, setSavedFilters] = useState<SavedFilter[]>(loadSavedFilters)
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const counts = useMemo(() => {
@@ -32,23 +34,10 @@ export default function App() {
     return result
   }, [events])
 
-  const filtered = useMemo(() => {
-    const term = search.trim().toLowerCase()
-    return events.filter(event => {
-      if (tab !== 'all' && event.type !== tab) return false
-      if (minDurationMs > 0 && (event.durationMs ?? 0) < minDurationMs) return false
-      if (!term) return true
-      return (
-        summarize(event).toLowerCase().includes(term) ||
-        (event.path ?? '').toLowerCase().includes(term) ||
-        (event.sql ?? '').toLowerCase().includes(term) ||
-        (event.parameters ?? '').toLowerCase().includes(term) ||
-        (event.message ?? '').toLowerCase().includes(term) ||
-        (event.category ?? '').toLowerCase().includes(term) ||
-        (event.responseBody ?? '').toLowerCase().includes(term)
-      )
-    })
-  }, [events, tab, search, minDurationMs])
+  const filtered = useMemo(
+    () => sortEvents(events.filter(event => matchesFilter(event, { type: tab, search, minDurationMs })), sort),
+    [events, tab, search, minDurationMs, sort],
+  )
 
   const selected = useMemo<TelemetryEvent | null>(
     () => events.find(event => event.id === selectedId) ?? null,
@@ -63,30 +52,61 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
+  const saveFilter = (name: string) => {
+    const filter: SavedFilter = {
+      id: crypto.randomUUID(),
+      name,
+      type: tab,
+      search,
+      minDurationMs,
+      sort,
+    }
+    setSavedFilters(previous => {
+      const next = [...previous.filter(candidate => candidate.name !== name), filter]
+      persistSavedFilters(next)
+      return next
+    })
+  }
+
+  const applyFilter = (filter: SavedFilter) => {
+    setTab(filter.type)
+    setSearch(filter.search)
+    setMinDurationMs(filter.minDurationMs)
+    setSort(filter.sort)
+  }
+
+  const deleteFilter = (id: string) => {
+    setSavedFilters(previous => {
+      const next = previous.filter(candidate => candidate.id !== id)
+      persistSavedFilters(next)
+      return next
+    })
+  }
+
   return (
     <div className="flex h-full bg-slate-950 text-slate-200">
-      <Sidebar
-        active={tab}
-        counts={counts}
-        status={status}
-        paused={paused}
-        onChange={setTab}
-      />
+      <Sidebar active={tab} counts={counts} status={status} paused={paused} onChange={setTab} />
 
       <main className="flex min-w-0 flex-1 flex-col">
         <Toolbar
           search={search}
           minDurationMs={minDurationMs}
+          sort={sort}
           paused={paused}
           visible={filtered.length}
           total={events.length}
+          savedFilters={savedFilters}
           onSearch={setSearch}
           onMinDuration={setMinDurationMs}
+          onSort={setSort}
           onTogglePause={() => setPaused(!paused)}
           onClear={() => {
             setSelectedId(null)
             void clear()
           }}
+          onSaveFilter={saveFilter}
+          onApplyFilter={applyFilter}
+          onDeleteFilter={deleteFilter}
         />
 
         <div className="flex min-h-0 flex-1">
