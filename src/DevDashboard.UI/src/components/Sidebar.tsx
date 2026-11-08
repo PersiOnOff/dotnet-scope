@@ -1,7 +1,6 @@
 import type { EventType } from '../types'
 import type { ConnectionStatus } from '../hooks/useTelemetry'
 import type { Theme } from '../hooks/useTheme'
-import { useI18n, type Locale } from '../i18n'
 
 type Tab = EventType | 'all'
 
@@ -11,6 +10,21 @@ const ICONS: Record<Tab, string> = {
   sql: '⌗',
   log: '≡',
   exception: '!',
+}
+
+const NAV: { id: Tab; label: string }[] = [
+  { id: 'all', label: 'All events' },
+  { id: 'http', label: 'Requests' },
+  { id: 'sql', label: 'SQL' },
+  { id: 'log', label: 'Logs' },
+  { id: 'exception', label: 'Exceptions' },
+]
+
+const STATUS_TEXT: Record<ConnectionStatus, string> = {
+  connecting: 'Connecting…',
+  connected: 'Live',
+  reconnecting: 'Reconnecting…',
+  offline: 'Offline',
 }
 
 const STATUS_TONE: Record<ConnectionStatus, string> = {
@@ -45,16 +59,6 @@ export default function Sidebar({
   onView,
   onTheme,
 }: Props) {
-  const { t, locale, setLocale } = useI18n()
-
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'all', label: t.nav.all },
-    { id: 'http', label: t.nav.http },
-    { id: 'sql', label: t.nav.sql },
-    { id: 'log', label: t.nav.log },
-    { id: 'exception', label: t.nav.exception },
-  ]
-
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-slate-800 bg-slate-950/70">
       <div className="flex items-center gap-2.5 px-5 py-5">
@@ -62,13 +66,13 @@ export default function Sidebar({
           ⠿
         </span>
         <div>
-          <div className="text-sm font-semibold tracking-tight text-slate-100">{t.app.name}</div>
-          <div className="text-[11px] text-slate-500">{t.app.tagline}</div>
+          <div className="text-sm font-semibold tracking-tight text-slate-100">DotNetScope</div>
+          <div className="text-[11px] text-slate-500">dev dashboard</div>
         </div>
       </div>
 
       <nav className="flex flex-col gap-0.5 px-3">
-        {tabs.map(tab => {
+        {NAV.map(tab => {
           const isActive = view === 'events' && active === tab.id
           return (
             <button
@@ -101,7 +105,7 @@ export default function Sidebar({
               }`}
             >
               <span className={`w-4 text-center font-mono ${view === 'database' ? 'text-indigo-300' : 'text-slate-600'}`}>⌸</span>
-              <span className="flex-1">{t.nav.database}</span>
+              <span className="flex-1">Database</span>
             </button>
           </>
         )}
@@ -109,14 +113,14 @@ export default function Sidebar({
 
       <div className="mt-auto space-y-3 border-t border-slate-800 px-5 py-4">
         <div className="flex items-center justify-between text-[11px] text-slate-600">
-          <span>{t.theme.label}</span>
+          <span>Theme</span>
           <div className="flex items-center gap-0.5 rounded-md border border-slate-800 p-0.5">
             {(['light', 'dark'] as Theme[]).map(mode => (
               <button
                 key={mode}
                 onClick={() => onTheme(mode)}
-                title={mode === 'light' ? t.theme.toLight : t.theme.toDark}
-                aria-label={mode === 'light' ? t.theme.toLight : t.theme.toDark}
+                title={mode === 'light' ? 'Switch to light theme' : 'Switch to dark theme'}
+                aria-label={mode === 'light' ? 'Switch to light theme' : 'Switch to dark theme'}
                 className={`rounded px-1.5 py-0.5 transition ${
                   theme === mode ? 'bg-slate-800 text-slate-200' : 'text-slate-600 hover:text-slate-400'
                 }`}
@@ -127,30 +131,14 @@ export default function Sidebar({
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-[11px] text-slate-600">
-          <span>{t.language.label}</span>
-          <div className="flex items-center gap-0.5 rounded-md border border-slate-800 p-0.5">
-            {(['en', 'ru'] as Locale[]).map(code => (
-              <button
-                key={code}
-                onClick={() => setLocale(code)}
-                aria-label={t.language.label}
-                className={`rounded px-1.5 py-0.5 uppercase transition ${
-                  locale === code ? 'bg-slate-800 text-slate-200' : 'text-slate-600 hover:text-slate-400'
-                }`}
-              >
-                {code}
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <span className={`h-1.5 w-1.5 rounded-full ${STATUS_TONE[paused ? 'offline' : status]}`} />
-          {paused ? t.connection.paused : t.connection[status === 'connected' ? 'live' : status]}
+          {paused ? 'Paused' : STATUS_TEXT[status]}
         </div>
 
-        <p className="text-[11px] leading-relaxed text-slate-600">{t.privacy}</p>
+        <p className="text-[11px] leading-relaxed text-slate-600">
+          Everything is captured in memory and never leaves this process.
+        </p>
       </div>
     </aside>
   )

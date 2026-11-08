@@ -1,18 +1,17 @@
 import type { TelemetryEvent } from '../types'
-import type { Locale, Messages } from '../i18n'
 import { formatDuration, prettyJson } from './format'
 
 /**
  * Renders one request and everything it caused as a markdown block that can be pasted into an
  * issue, a PR comment or a chat without losing the SQL and the stack trace.
  */
-export function toMarkdown(request: TelemetryEvent, related: TelemetryEvent[], t: Messages, locale: Locale): string {
+export function toMarkdown(request: TelemetryEvent, related: TelemetryEvent[]): string {
   const lines: string[] = []
 
   const status = request.statusCode ? ` → ${request.statusCode}` : ''
   const duration =
     request.durationMs !== null && request.durationMs !== undefined
-      ? ` (${formatDuration(request.durationMs, locale)})`
+      ? ` (${formatDuration(request.durationMs)})`
       : ''
   lines.push(`### ${request.method ?? 'REQUEST'} ${request.path ?? ''}${status}${duration}`.trim())
   lines.push('')
@@ -20,12 +19,12 @@ export function toMarkdown(request: TelemetryEvent, related: TelemetryEvent[], t
   if (request.traceId) lines.push('', `trace: \`${request.traceId}\``)
 
   if (request.requestBody) {
-    lines.push('', `#### ${t.markdown.requestBody}`, fence('', prettyJson(request.requestBody) ?? request.requestBody))
+    lines.push('', '#### Request body', fence('', prettyJson(request.requestBody) ?? request.requestBody))
   }
 
   const sql = related.filter(event => event.type === 'sql')
   if (sql.length > 0) {
-    lines.push('', `#### ${t.markdown.sql} (${sql.length})`)
+    lines.push('', `#### SQL (${sql.length})`)
     for (const event of sql) {
       const parameters = event.parameters
         ? '\n' + event.parameters.split('\n').map(line => `-- ${line}`).join('\n')
@@ -36,7 +35,7 @@ export function toMarkdown(request: TelemetryEvent, related: TelemetryEvent[], t
 
   const logs = related.filter(event => event.type === 'log')
   if (logs.length > 0) {
-    lines.push('', `#### ${t.markdown.logs} (${logs.length})`)
+    lines.push('', `#### Logs (${logs.length})`)
     for (const event of logs) {
       const category = event.category ? ` \`${event.category}\`` : ''
       lines.push(`- **${event.logLevel ?? 'Log'}**${category} — ${event.message ?? ''}`)
@@ -45,7 +44,7 @@ export function toMarkdown(request: TelemetryEvent, related: TelemetryEvent[], t
 
   const exceptions = related.filter(event => event.type === 'exception' || event.exception)
   if (exceptions.length > 0) {
-    lines.push('', `#### ${t.markdown.exception}`)
+    lines.push('', '#### Exception')
     for (const event of exceptions) {
       lines.push('', fence('text', event.exception ?? event.message ?? ''))
     }
@@ -53,7 +52,7 @@ export function toMarkdown(request: TelemetryEvent, related: TelemetryEvent[], t
 
   if (request.responseBody) {
     const pretty = prettyJson(request.responseBody)
-    lines.push('', `#### ${t.markdown.responseBody}`, fence(pretty ? 'json' : '', pretty ?? request.responseBody))
+    lines.push('', '#### Response body', fence(pretty ? 'json' : '', pretty ?? request.responseBody))
   }
 
   return lines.join('\n') + '\n'

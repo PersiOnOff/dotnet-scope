@@ -4,6 +4,7 @@ import { toJsonExport, toMarkdown } from '../lib/export'
 import {
   TYPE_STYLE,
   durationTone,
+  formatCount,
   formatDuration,
   formatTime,
   highlightSql,
@@ -12,7 +13,6 @@ import {
   statusTone,
   summarize,
 } from '../lib/format'
-import { useI18n } from '../i18n'
 
 type Props = {
   event: TelemetryEvent | null
@@ -23,8 +23,6 @@ type Props = {
 }
 
 export default function EventDetails({ event, all, onSelect, onClose, onFilterTrace }: Props) {
-  const { t, locale } = useI18n()
-
   const children = useMemo(
     () => (event ? all.filter(candidate => candidate.requestId === event.id && candidate.id !== event.id) : []),
     [event, all],
@@ -50,8 +48,8 @@ export default function EventDetails({ event, all, onSelect, onClose, onFilterTr
         <div className="grid h-10 w-10 place-items-center rounded-xl bg-slate-900 text-slate-600 ring-1 ring-inset ring-slate-800">
           ↖
         </div>
-        <p className="mt-3 text-sm text-slate-500">{t.details.placeholderTitle}</p>
-        <p className="mt-1 text-xs text-slate-600">{t.details.placeholderBody}</p>
+        <p className="mt-3 text-sm text-slate-500">Select an event to inspect it.</p>
+        <p className="mt-1 text-xs text-slate-600">SQL, bodies and stack traces are grouped by request.</p>
       </aside>
     )
   }
@@ -63,26 +61,26 @@ export default function EventDetails({ event, all, onSelect, onClose, onFilterTr
     <aside className="flex w-[26rem] shrink-0 flex-col border-l border-slate-800 bg-slate-950/40">
       <header className="flex items-start gap-3 border-b border-slate-800 px-4 py-3">
         <span className={`mt-0.5 rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold ring-1 ring-inset ${style.badge}`}>
-          {t.types[event.type]}
+          {style.label}
         </span>
         <div className="min-w-0 flex-1">
           <div className="truncate font-mono text-[13px] text-slate-200">{summarize(event) || event.type}</div>
           <div className="mt-0.5 font-mono text-[11px] text-slate-500">
             {formatTime(event.timestamp)}
             {event.durationMs !== null && event.durationMs !== undefined && (
-              <span className={durationTone(event.durationMs)}> · {formatDuration(event.durationMs, locale)}</span>
+              <span className={durationTone(event.durationMs)}> · {formatDuration(event.durationMs)}</span>
             )}
             {event.statusCode ? <span className={statusTone(event.statusCode)}> · {event.statusCode}</span> : null}
           </div>
         </div>
-        <button onClick={onClose} className="rounded p-1 text-slate-600 hover:bg-slate-800 hover:text-slate-300" title={t.details.close}>
+        <button onClick={onClose} className="rounded p-1 text-slate-600 hover:bg-slate-800 hover:text-slate-300" title="Close">
           ✕
         </button>
       </header>
 
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {event.sql && (
-          <Block title={t.details.sql} copy={event.sql}>
+          <Block title="SQL" copy={event.sql}>
             <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-[12px] leading-relaxed text-slate-300">
               {highlightSql(event.sql).map((token, index) => (
                 <span
@@ -105,19 +103,19 @@ export default function EventDetails({ event, all, onSelect, onClose, onFilterTr
         )}
 
         {event.parameters && (
-          <Block title={t.details.parameters} copy={event.parameters}>
+          <Block title="Parameters" copy={event.parameters}>
             <Code>{event.parameters}</Code>
           </Block>
         )}
 
         {event.requestBody && (
-          <Block title={t.details.requestBody} copy={event.requestBody}>
+          <Block title="Request body" copy={event.requestBody}>
             <Code>{prettyJson(event.requestBody) ?? event.requestBody}</Code>
           </Block>
         )}
 
         {event.responseBody && (
-          <Block title={json ? t.details.responseBodyJson : t.details.responseBody} copy={event.responseBody}>
+          <Block title={json ? 'Response body · JSON' : 'Response body'} copy={event.responseBody}>
             <Code>{json ?? event.responseBody}</Code>
           </Block>
         )}
@@ -125,9 +123,9 @@ export default function EventDetails({ event, all, onSelect, onClose, onFilterTr
         {event.exception && <ExceptionBlock exception={event.exception} />}
 
         {event.type === 'http' && (
-          <Block title={`${t.details.related} (${children.length})`}>
+          <Block title={`Related events (${children.length})`}>
             {children.length === 0 ? (
-              <p className="text-xs text-slate-600">{t.details.noRelated}</p>
+              <p className="text-xs text-slate-600">No SQL or logs were emitted while this request ran.</p>
             ) : (
               <div className="space-y-1">
                 {children.map(child => (
@@ -139,7 +137,7 @@ export default function EventDetails({ event, all, onSelect, onClose, onFilterTr
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${TYPE_STYLE[child.type].dot}`} />
                     <span className="truncate font-mono text-[12px] text-slate-400">{summarize(child)}</span>
                     <span className="ml-auto shrink-0 font-mono text-[11px] text-slate-600">
-                      {formatDuration(child.durationMs, locale)}
+                      {formatDuration(child.durationMs)}
                     </span>
                   </button>
                 ))}
@@ -149,7 +147,7 @@ export default function EventDetails({ event, all, onSelect, onClose, onFilterTr
         )}
 
         {parent && (
-          <Block title={t.details.partOfRequest}>
+          <Block title="Part of request">
             <button
               onClick={() => onSelect(parent)}
               className="flex w-full items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/60 px-2.5 py-2 text-left hover:border-indigo-500/40 hover:bg-indigo-500/10"
@@ -164,7 +162,7 @@ export default function EventDetails({ event, all, onSelect, onClose, onFilterTr
         )}
 
         {event.traceId && (
-          <Block title={t.details.trace} copy={event.spanId ? `${event.traceId}/${event.spanId}` : event.traceId}>
+          <Block title="Trace" copy={event.spanId ? `${event.traceId}/${event.spanId}` : event.traceId}>
             <div className="flex items-start gap-2">
               <div className="min-w-0 flex-1">
                 <Code>{event.spanId ? `${event.traceId} · ${event.spanId}` : event.traceId}</Code>
@@ -173,31 +171,30 @@ export default function EventDetails({ event, all, onSelect, onClose, onFilterTr
                 onClick={() => onFilterTrace(event.traceId ?? '')}
                 className="shrink-0 rounded-lg border border-slate-800 bg-slate-950/80 px-2 py-1 text-[11px] text-slate-400 transition hover:border-indigo-500/40 hover:text-indigo-300"
               >
-                {t.details.filterByTrace}
+                Filter by trace
               </button>
             </div>
           </Block>
         )}
 
         {event.category && (
-          <Block title={t.details.category}>
+          <Block title="Category">
             <Code>{event.category}</Code>
           </Block>
         )}
 
-        <Block title={t.details.eventId}>
+        <Block title="Event id">
           <Code>{event.id}</Code>
         </Block>
       </div>
 
       {bundle && (
         <footer className="flex items-center gap-2 border-t border-slate-800 bg-slate-950/60 px-4 py-2">
-          <ExportButton
-            label={t.details.exportMarkdown}
-            build={() => toMarkdown(bundle.request, bundle.related, t, locale)}
-          />
-          <ExportButton label={t.details.exportJson} build={() => toJsonExport(bundle.request, bundle.related)} />
-          <span className="ml-auto font-mono text-[11px] text-slate-600">{t.details.events(bundle.related.length + 1)}</span>
+          <ExportButton label="Copy markdown" build={() => toMarkdown(bundle.request, bundle.related)} />
+          <ExportButton label="Copy JSON" build={() => toJsonExport(bundle.request, bundle.related)} />
+          <span className="ml-auto font-mono text-[11px] text-slate-600">
+            {formatCount(bundle.related.length + 1, 'event', 'events')}
+          </span>
         </footer>
       )}
     </aside>
@@ -205,12 +202,11 @@ export default function EventDetails({ event, all, onSelect, onClose, onFilterTr
 }
 
 function ExceptionBlock({ exception }: { exception: string }) {
-  const { t } = useI18n()
   const lines = stackFrames(exception)
   const [head, ...frames] = lines
 
   return (
-    <Block title={t.details.exception} copy={exception}>
+    <Block title="Exception" copy={exception}>
       <div className="rounded-lg border border-rose-500/20 bg-rose-500/5 p-3">
         <p className="font-mono text-[12px] font-semibold text-rose-300">{head}</p>
         <div className="mt-2 space-y-0.5">
@@ -224,7 +220,6 @@ function ExceptionBlock({ exception }: { exception: string }) {
 }
 
 function Frame({ frame }: { frame: string }) {
-  const { t } = useI18n()
   const marker = ' in '
   const splitAt = frame.indexOf(marker)
   const isFrame = frame.startsWith('at ')
@@ -234,7 +229,7 @@ function Frame({ frame }: { frame: string }) {
   return (
     <button
       onClick={() => void navigator.clipboard?.writeText(frame)}
-      title={t.details.copyFrame}
+      title="Copy frame"
       className="block w-full rounded px-1 py-0.5 text-left font-mono text-[11px] hover:bg-rose-500/10"
     >
       <span className={`block truncate ${isFrame ? 'text-slate-400' : 'text-slate-500'}`}>{call}</span>
@@ -279,7 +274,6 @@ function Block({ title, copy, children }: { title: string; copy?: string; childr
 }
 
 function CopyButton({ value }: { value: string }) {
-  const { t } = useI18n()
   const [copied, setCopied] = useState(false)
 
   const copy = async () => {
@@ -294,7 +288,7 @@ function CopyButton({ value }: { value: string }) {
 
   return (
     <button onClick={copy} className="text-[11px] text-slate-600 hover:text-indigo-300">
-      {copied ? t.details.copied : t.details.copy}
+      {copied ? 'copied' : 'copy'}
     </button>
   )
 }

@@ -44,7 +44,6 @@ DotNetScope is not a replacement for production observability. It is the thing y
 - **Bodies on demand** — request and response bodies, JSON pretty-printed.
 - **Live over SignalR** — pause the stream when a noisy endpoint floods the list.
 - **Database tab** — browse the tables of any ADO.NET connection you register, read-only, without leaving the dashboard.
-- **English and Russian UI** — follows your browser language, one click in the sidebar to switch.
 - **Dark and light themes** — follows your OS, switchable in the sidebar, remembered.
 - **Trace correlation** — every event carries the W3C `trace_id`/`span_id` of the ambient `Activity`, with no OpenTelemetry dependency.
 - **Local-only by default** — remote access is opt-in, because this data is sensitive.
@@ -147,18 +146,6 @@ builder.Services.AddDevDashboard(options =>
 Read-only by design: table names come from the provider's own catalog (`sqlite_master` for SQLite, `INFORMATION_SCHEMA` for SQL Server, `GetSchema` for everything else), a page of rows is read with a hard limit, and an identifier is only quoted after it matched that catalog.
 
 SQL Server goes through the same path — register `() => new SqlConnection(connectionString)` and the tab lists `INFORMATION_SCHEMA.TABLES`. The test suite covers SQLite.
-
-## Localization
-
-The UI follows your browser language and remembers an explicit choice. English and Russian ship today; the switch is at the bottom of the sidebar.
-
-<p align="center">
-  <img src="docs/screenshots/dashboard-ru.png" width="85%" alt="Russian interface" />
-</p>
-
-Adding a language is one file: copy [`src/DevDashboard.UI/src/i18n/en.ts`](src/DevDashboard.UI/src/i18n/en.ts), translate it, and register the locale in `i18n/index.tsx`. The Russian dictionary is typed against the English one, so a missing key is a compile error instead of a stray English string at runtime; plural forms are per-language (1 событие / 2 события / 5 событий).
-
-This README is also available in Russian: [README.ru.md](README.ru.md).
 
 ## Themes
 

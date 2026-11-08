@@ -1,16 +1,17 @@
 import type { EventType, TelemetryEvent } from '../types'
-import type { Locale } from '../i18n'
 
 export const API = '/_dashboard/api'
 export const HUB = '/_dashboard/hub'
 export const MAX_EVENTS = 1000
 
-export function formatDuration(ms?: number | null, locale: Locale = 'en'): string {
+export function formatDuration(ms?: number | null): string {
   if (ms === null || ms === undefined) return '—'
-  const millis = locale === 'ru' ? 'мс' : 'ms'
-  const seconds = locale === 'ru' ? 'с' : 's'
-  if (ms < 1000) return `${ms} ${millis}`
-  return `${(ms / 1000).toFixed(2)} ${seconds}`
+  if (ms < 1000) return `${ms} ms`
+  return `${(ms / 1000).toFixed(2)} s`
+}
+
+export function formatCount(count: number, singular: string, plural: string): string {
+  return `${count} ${count === 1 ? singular : plural}`
 }
 
 export function formatTime(timestamp: string): string {
@@ -33,11 +34,11 @@ export function durationTone(ms?: number | null): string {
   return 'text-emerald-400'
 }
 
-export const TYPE_STYLE: Record<EventType, { badge: string; dot: string }> = {
-  http: { badge: 'bg-indigo-500/10 text-indigo-300 ring-indigo-500/30', dot: 'bg-indigo-400' },
-  sql: { badge: 'bg-violet-500/10 text-violet-300 ring-violet-500/30', dot: 'bg-violet-400' },
-  log: { badge: 'bg-sky-500/10 text-sky-300 ring-sky-500/30', dot: 'bg-sky-400' },
-  exception: { badge: 'bg-rose-500/10 text-rose-300 ring-rose-500/30', dot: 'bg-rose-400' },
+export const TYPE_STYLE: Record<EventType, { label: string; badge: string; dot: string }> = {
+  http: { label: 'HTTP', badge: 'bg-indigo-500/10 text-indigo-300 ring-indigo-500/30', dot: 'bg-indigo-400' },
+  sql: { label: 'SQL', badge: 'bg-violet-500/10 text-violet-300 ring-violet-500/30', dot: 'bg-violet-400' },
+  log: { label: 'LOG', badge: 'bg-sky-500/10 text-sky-300 ring-sky-500/30', dot: 'bg-sky-400' },
+  exception: { label: 'ERR', badge: 'bg-rose-500/10 text-rose-300 ring-rose-500/30', dot: 'bg-rose-400' },
 }
 
 export function summarize(event: TelemetryEvent): string {

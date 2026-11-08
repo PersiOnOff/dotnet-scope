@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { DataSourceInfo, TablePage } from '../types'
 import { fetchTable } from '../lib/database'
-import { useI18n } from '../i18n'
+import { formatCount } from '../lib/format'
 
 type Props = {
   sources: DataSourceInfo[]
@@ -14,7 +14,6 @@ const CONTROL =
   'rounded-lg border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-sm text-slate-300 focus:border-indigo-500/60 focus:outline-none'
 
 export default function DatabaseView({ sources, loaded, onRefresh }: Props) {
-  const { t } = useI18n()
   const [selected, setSelected] = useState<{ source: string; table: string } | null>(null)
   const [limit, setLimit] = useState(50)
   const [page, setPage] = useState<TablePage | null>(null)
@@ -60,7 +59,7 @@ export default function DatabaseView({ sources, loaded, onRefresh }: Props) {
   }, [selected, limit])
 
   if (!loaded) {
-    return <div className="flex flex-1 items-center justify-center text-sm text-slate-500">{t.db.loading}</div>
+    return <div className="flex flex-1 items-center justify-center text-sm text-slate-500">Loading…</div>
   }
 
   if (sources.length === 0) {
@@ -70,7 +69,7 @@ export default function DatabaseView({ sources, loaded, onRefresh }: Props) {
   return (
     <div className="flex min-h-0 flex-1">
       <aside className="w-60 shrink-0 overflow-y-auto border-r border-slate-800 bg-slate-950/40">
-        <div className="px-4 py-3 text-[11px] uppercase tracking-wider text-slate-500">{t.db.tables}</div>
+        <div className="px-4 py-3 text-[11px] uppercase tracking-wider text-slate-500">Tables</div>
         {sources.map(source => (
           <div key={source.name} className="mb-3">
             <div className="truncate px-4 py-1 font-mono text-[11px] text-slate-500">{source.name}</div>
@@ -98,29 +97,29 @@ export default function DatabaseView({ sources, loaded, onRefresh }: Props) {
         <header className="flex flex-wrap items-center gap-2 border-b border-slate-800 bg-slate-900/40 px-4 py-2.5">
           <div className="min-w-0">
             <div className="truncate font-mono text-sm text-slate-200">
-              {selected ? `${selected.source}.${selected.table}` : t.db.title}
+              {selected ? `${selected.source}.${selected.table}` : 'Database'}
             </div>
-            <div className="text-[11px] text-slate-600">{t.db.subtitle}</div>
+            <div className="text-[11px] text-slate-600">Read-only, first rows only</div>
           </div>
 
           <div className="ml-auto flex items-center gap-2">
             {page && (
               <span className="font-mono text-[11px] text-slate-600">
-                {t.db.rows(page.rows.length)}
-                {page.truncated ? ` · ${t.db.truncated}` : ''}
+                {formatCount(page.rows.length, 'row', 'rows')}
+                {page.truncated ? ' · limit reached' : ''}
               </span>
             )}
 
             <select value={limit} onChange={event => setLimit(Number(event.target.value))} className={CONTROL}>
               {LIMITS.map(value => (
                 <option key={value} value={value}>
-                  {t.db.limit}: {value}
+                  Rows: {value}
                 </option>
               ))}
             </select>
 
             <button onClick={onRefresh} className="rounded-lg border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-sm text-slate-300 hover:border-indigo-500/40 hover:text-indigo-300">
-              {t.db.refresh}
+              Refresh
             </button>
           </div>
         </header>
@@ -128,11 +127,11 @@ export default function DatabaseView({ sources, loaded, onRefresh }: Props) {
         <div className="min-h-0 flex-1 overflow-auto">
           {error ? (
             <div className="m-4 rounded-lg border border-rose-500/30 bg-rose-500/5 p-4">
-              <p className="text-sm font-medium text-rose-300">{t.db.errorTitle}</p>
+              <p className="text-sm font-medium text-rose-300">Could not read the table</p>
               <p className="mt-1 font-mono text-[12px] text-rose-200/80">{error}</p>
             </div>
           ) : !page ? (
-            <div className="p-6 text-sm text-slate-500">{loading ? t.db.loading : t.db.selectTable}</div>
+            <div className="p-6 text-sm text-slate-500">{loading ? 'Loading…' : 'Select a table on the left.'}</div>
           ) : (
             <TableGrid page={page} />
           )}
@@ -143,8 +142,6 @@ export default function DatabaseView({ sources, loaded, onRefresh }: Props) {
 }
 
 function TableGrid({ page }: { page: TablePage }) {
-  const { t } = useI18n()
-
   return (
     <table className="min-w-full border-collapse text-left font-mono text-[12px]">
       <thead className="sticky top-0 z-10 bg-slate-900">
@@ -160,7 +157,7 @@ function TableGrid({ page }: { page: TablePage }) {
         {page.rows.length === 0 ? (
           <tr>
             <td colSpan={Math.max(page.columns.length, 1)} className="px-3 py-6 text-center text-slate-600">
-              {t.db.emptyTable}
+              This table has no rows.
             </td>
           </tr>
         ) : (
@@ -168,7 +165,7 @@ function TableGrid({ page }: { page: TablePage }) {
             <tr key={index} className="hover:bg-slate-800/40">
               {row.map((value, cell) => (
                 <td key={cell} className="max-w-[30rem] truncate border-b border-slate-800/60 px-3 py-1.5 text-slate-300">
-                  {value === null ? <span className="italic text-slate-600">{t.db.nullValue}</span> : String(value)}
+                  {value === null ? <span className="italic text-slate-600">NULL</span> : String(value)}
                 </td>
               ))}
             </tr>
@@ -180,18 +177,16 @@ function TableGrid({ page }: { page: TablePage }) {
 }
 
 function NoSources() {
-  const { t } = useI18n()
-
   return (
     <div className="flex flex-1 items-center justify-center p-8">
       <div className="max-w-lg space-y-3 text-center">
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-slate-900 text-xl text-slate-500 ring-1 ring-inset ring-slate-800">
           ⌸
         </div>
-        <h2 className="text-base font-semibold text-slate-200">{t.db.noSourcesTitle}</h2>
-        <p className="text-sm text-slate-500">{t.db.noSourcesBody}</p>
+        <h2 className="text-base font-semibold text-slate-200">No data sources registered</h2>
+        <p className="text-sm text-slate-500">Register one where the dashboard is configured:</p>
         <pre className="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950/80 p-3 text-left font-mono text-[12px] text-slate-400">
-          {t.db.noSourcesCode}
+          options.AddDataSource("app", () =&gt; new SqliteConnection(...))
         </pre>
       </div>
     </div>
