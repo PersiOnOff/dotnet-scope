@@ -76,7 +76,7 @@ app.Run();
 
 Запустите приложение, сделайте запрос, откройте **`http://localhost:5000/_dashboard`**.
 
-> Пакет опубликован на nuget.org: [DotNetScope 0.1.0](https://www.nuget.org/packages/DotNetScope) — целевая платформа .NET 10.
+> Пакет опубликован на nuget.org: [DotNetScope](https://www.nuget.org/packages/DotNetScope) — целевая платформа .NET 10.
 
 ### Запустить пример
 

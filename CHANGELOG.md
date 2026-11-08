@@ -4,24 +4,23 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.1] - 2026-11-08
+
+### Added
+
+- Request bundle export: `GET /_dashboard/api/requests/{id}` returns one request with every SQL command, log record and exception it produced; the details pane copies it as markdown or JSON.
+- Saved filters: the current type, search, duration and sort can be stored as a named chip and survive a reload.
+- “Slowest first” sort order for the event stream.
+- Database tab: `options.AddDataSource(...)` registers an ADO.NET connection whose tables can be browsed read-only, via `GET /_dashboard/api/db` and `GET /_dashboard/api/db/{source}/{table}?limit=`. Table discovery uses the provider catalog and an identifier is quoted only after matching it.
+- Light theme: every colour is a CSS variable, so the palette swaps with one class on `<html>`; follows `prefers-color-scheme` until the sidebar switch is used.
+- Trace correlation: `TraceId`/`SpanId` come from `Activity.Current`, so events line up with OpenTelemetry traces without an OpenTelemetry dependency. The UI filters by trace and the API accepts `?traceId=`.
+- Russian README (`README.ru.md`) with a language switch at the top of both files.
 
 ### Changed
 
 - Build toolchain: Vite 8, `@vitejs/plugin-react` 6 and TypeScript 7; the Node floor is now 20.19 (CI uses 22.12).
 - CI and the release workflow run `npm run typecheck` before building the UI, so a type error fails the pipeline instead of shipping.
-
-### Added
-
-- `GET /_dashboard/api/requests/{id}`: one HTTP request together with the SQL, logs and exceptions it produced.
-- “Copy markdown” and “Copy JSON” in the details pane, exporting the selected request or the request a SQL/log event belongs to.
-- Saved filters: the current type, search, duration and sort can be stored as a named chip (persisted in `localStorage`).
-- “Slowest first” sort order for the event stream.
-- Russian README (`README.ru.md`) with a language switch at the top of both files.
-- Database tab: register an ADO.NET connection with `options.AddDataSource(...)` and browse its tables and first rows read-only. Table discovery uses the provider catalog (SQLite, SQL Server, `GetSchema` fallback); identifiers are quoted only after matching that catalog.
-- `GET /_dashboard/api/db` and `GET /_dashboard/api/db/{source}/{table}?limit=`.
-- Light theme: every colour is a CSS variable, so the palette swaps with one class on `<html>`. Follows `prefers-color-scheme` until the sidebar switch is used, and the choice is remembered. No flash of the wrong theme on load.
-- Trace correlation: `TelemetryEvent.TraceId`/`SpanId` are filled from `Activity.Current`, so events line up with OpenTelemetry traces without an OpenTelemetry dependency. The details pane shows the trace and filters the stream by it; the API accepts `?traceId=`.
+- Dependencies: EF Core 10.0.14, Microsoft.NET.Test.Sdk 18.11, SQLitePCLRaw 2.1.13, React 19.
 
 ## [0.1.0] - 2026-11-08
 

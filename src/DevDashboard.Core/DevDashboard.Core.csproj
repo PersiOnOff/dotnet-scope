@@ -8,7 +8,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <PackageId>DotNetScope</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>PersiOnOff</Authors>
     <Company>DotNetScope</Company>
     <Description>Self-hosted, zero-config dev dashboard for .NET: HTTP requests, EF Core SQL, logs and exceptions in real time, grouped by request.</Description>

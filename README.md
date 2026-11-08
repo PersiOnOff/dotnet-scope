@@ -76,7 +76,7 @@ app.Run();
 
 Run the app, make a request, open **`http://localhost:5000/_dashboard`**.
 
-> Published on nuget.org: [DotNetScope 0.1.0](https://www.nuget.org/packages/DotNetScope) — targets .NET 10.
+> Published on nuget.org: [DotNetScope](https://www.nuget.org/packages/DotNetScope) — targets .NET 10.
 
 ### Run the sample
 
