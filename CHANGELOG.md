@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Build toolchain: Vite 8, `@vitejs/plugin-react` 6 and TypeScript 7; the Node floor is now 20.19 (CI uses 22.12).
+- CI and the release workflow run `npm run typecheck` before building the UI, so a type error fails the pipeline instead of shipping.
+
 ### Added
 
 - `GET /_dashboard/api/requests/{id}`: one HTTP request together with the SQL, logs and exceptions it produced.
