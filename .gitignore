@@ -1,0 +1,16 @@
+bin/
+obj/
+node_modules/
+dist/
+artifacts/
+*.nupkg
+*.snupkg
+TestResults/
+.vs/
+.idea/
+*.user
+*.suo
+sample.db
+sample.db-shm
+sample.db-wal
+.env

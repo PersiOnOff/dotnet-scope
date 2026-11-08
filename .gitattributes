@@ -1,0 +1,17 @@
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.nupkg binary
+*.snupkg binary
+*.db binary
+
+# MSBuild's solution parser is picky about the header line: keep .sln as CRLF.
+*.sln text eol=crlf
+
+docs/screenshots/* linguist-documentation
+src/DevDashboard.Core/wwwroot/** linguist-generated=true
+src/DevDashboard.UI/package-lock.json linguist-generated=true

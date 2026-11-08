@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest a feature that would make DotNetScope more useful
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The project has one hard constraint: **it stays zero-config**. A feature that requires an
+        external service, a database or a background daemon is out of scope — say what you need
+        and we will find the smallest version of it.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the debugging situation, not the implementation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like to see?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Including other tools and why they did not fit.
+    validations:
+      required: false

@@ -1,0 +1,84 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to pack, without the leading v (e.g. 0.2.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: pack · publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: src/DevDashboard.UI/package-lock.json
+
+      - name: Build UI
+        working-directory: src/DevDashboard.UI
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build
+        run: |
+          dotnet build src/DevDashboard.Core/DevDashboard.Core.csproj -c Release
+          dotnet build samples/SampleWebApi/SampleWebApi.csproj -c Release
+
+      - name: Test
+        run: dotnet test tests/DevDashboard.Tests/DevDashboard.Tests.csproj -c Release
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Pack
+        run: >
+          dotnet pack src/DevDashboard.Core/DevDashboard.Core.csproj
+          -c Release --no-build -o artifacts
+          -p:Version=${{ steps.version.outputs.value }}
+          -p:ContinuousIntegrationBuild=true
+
+      - name: Publish to nuget.org
+        if: ${{ env.NUGET_API_KEY != '' }}
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push "artifacts/*.nupkg" \
+            --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+          dotnet nuget push "artifacts/*.snupkg" \
+            --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ steps.version.outputs.value }}
+          generate_release_notes: true
+          files: artifacts/*.*nupkg

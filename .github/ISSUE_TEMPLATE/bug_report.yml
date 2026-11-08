@@ -1,0 +1,68 @@
+name: Bug report
+description: Something in the dashboard is wrong or broken
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. A minimal reproduction is worth more than a long description —
+        if you can share the two lines you registered and the endpoint that misbehaves, that is
+        usually enough.
+
+  - type: input
+    id: version
+    attributes:
+      label: DotNetScope version
+      placeholder: 0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: dotnet
+    attributes:
+      label: .NET version
+      placeholder: net10.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where does it happen?
+      options:
+        - Event list / UI
+        - HTTP capture
+        - SQL capture (EF Core)
+        - Logs
+        - Exceptions
+        - Dashboard API
+        - Packaging / installation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead?
+      description: Screenshots and console output help a lot.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. `dotnet run --project samples/SampleWebApi`
+        2. `curl http://localhost:5000/api/checkout`
+        3. open /_dashboard
+    validations:
+      required: true

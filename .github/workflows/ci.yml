@@ -1,0 +1,62 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build · test · pack
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: src/DevDashboard.UI/package-lock.json
+
+      - name: Build UI
+        working-directory: src/DevDashboard.UI
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build
+        run: |
+          dotnet build src/DevDashboard.Core/DevDashboard.Core.csproj -c Release
+          dotnet build samples/SampleWebApi/SampleWebApi.csproj -c Release
+
+      - name: Test
+        run: dotnet test tests/DevDashboard.Tests/DevDashboard.Tests.csproj -c Release --logger "trx;LogFileName=test-results.trx"
+
+      - name: Pack
+        run: dotnet pack src/DevDashboard.Core/DevDashboard.Core.csproj -c Release --no-build -o artifacts
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*.*nupkg
+          if-no-files-found: error
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: '**/test-results.trx'
+          if-no-files-found: ignore

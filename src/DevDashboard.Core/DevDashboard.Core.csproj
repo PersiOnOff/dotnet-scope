@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <PackageId>DotNetScope</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>PersiOnOff</Authors>
+    <Company>DotNetScope</Company>
+    <Description>Self-hosted, zero-config dev dashboard for .NET: HTTP requests, EF Core SQL, logs and exceptions in real time, grouped by request.</Description>
+    <PackageTags>dotnet;aspnetcore;dashboard;devtools;diagnostics;telemetry;sql;efcore;logging;observability</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/PersiOnOff/dotnet-scope</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PersiOnOff/dotnet-scope</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.0" />
+    <EmbeddedResource Include="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Condition="Exists('..\..\README.md')" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" Condition="Exists('..\..\LICENSE')" />
+  </ItemGroup>
+
+  <!-- The UI is compiled by Vite straight into wwwroot; fail loudly instead of shipping an empty dashboard. -->
+  <Target Name="EnsureDashboardAssets" BeforeTargets="Pack">
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)\wwwroot\index.html')"
+           Text="The dashboard UI is missing from wwwroot. Run 'npm ci &amp;&amp; npm run build' in src/DevDashboard.UI before packing." />
+  </Target>
+
+</Project>
